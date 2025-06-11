@@ -23,6 +23,14 @@ else
 	API_PROTO_FILES=$(shell find api -name *.proto)
 endif
 
+.PHONY: ctrl
+ctrl:
+	gf gen ctrl
+
+.PHONY: dao
+dao:
+	gf gen dao
+
 .PHONY: genall
 # Generate gf code
 genall:

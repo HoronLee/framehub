@@ -8,15 +8,15 @@ import (
 	"framehub/internal/dao/internal"
 )
 
-// userDao is the data access object for the table user.
+// usersDao is the data access object for the table users.
 // You can define custom methods on it to extend its functionality as needed.
-type userDao struct {
-	*internal.UserDao
+type usersDao struct {
+	*internal.UsersDao
 }
 
 var (
-	// User is a globally accessible object for table user operations.
-	User = userDao{internal.NewUserDao()}
+	// Users is a globally accessible object for table users operations.
+	Users = usersDao{internal.NewUsersDao()}
 )
 
 // Add your custom methods and functionality below.

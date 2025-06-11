@@ -7,7 +7,7 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
 
-	"framehub/internal/controller/hello"
+	"framehub/internal/controller/users"
 )
 
 var (
@@ -19,9 +19,11 @@ var (
 			s := g.Server()
 			s.Group("/", func(group *ghttp.RouterGroup) {
 				group.Middleware(ghttp.MiddlewareHandlerResponse)
-				group.Bind(
-					hello.NewV1(),
-				)
+				group.Group("/v1", func(group *ghttp.RouterGroup) {
+					group.Bind(
+						users.NewV1(),
+					)
+				})
 			})
 			s.Run()
 			return nil
