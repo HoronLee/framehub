@@ -13,3 +13,7 @@ inte.../cont.../users/users_v1_*.go |                 |
                                                       ↓
                                     internal/cmd/cmd.go
 ```
+
+## 接口文档
+
+[APIFox接口文档](https://o36k1oz5or.apifox.cn)
