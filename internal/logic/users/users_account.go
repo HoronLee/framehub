@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -44,4 +45,23 @@ func (u *Users) Login(ctx context.Context, name, password string) (tokenString s
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, uc)
 	return token.SignedString([]byte(consts.JwtKey))
+}
+
+func (u *Users) Info(ctx context.Context) (user *entity.Users, err error) {
+	// 从上下文中获取用户信息
+	tokenString := g.RequestFromCtx(ctx).Request.Header.Get("Authorization")
+
+	// 如果有 "Bearer " 前缀，移除它
+	if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
+		tokenString = tokenString[7:]
+	}
+
+	tokenClaims, _ := jwt.ParseWithClaims(tokenString, &jwtClaims{}, func(token *jwt.Token) (any, error) {
+		return []byte(consts.JwtKey), nil
+	})
+
+	if claims, ok := tokenClaims.Claims.(*jwtClaims); ok && tokenClaims.Valid {
+		err = dao.Users.Ctx(ctx).Where("id", claims.Id).Scan(&user)
+	}
+	return
 }
