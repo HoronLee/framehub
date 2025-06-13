@@ -12,6 +12,21 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type jwtConfig struct {
+	SecretKey string
+	Issuer    string
+	Expire    time.Time
+}
+
+func InitJwtawConfig(ctx context.Context) *jwtConfig {
+	conf, _ := g.Cfg().Get(ctx, "jwt")
+	return &jwtConfig{
+		SecretKey: conf.MapStrVar()["secretKey"].String(),
+		Issuer:    conf.MapStrVar()["issuer"].String(),
+		Expire:    conf.MapStrVar()["expire"].Time(),
+	}
+}
+
 type jwtClaims struct {
 	Id   uint
 	Name string
