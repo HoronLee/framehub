@@ -15,6 +15,7 @@ import (
 type jwtClaims struct {
 	Id   uint
 	Name string
+	Role string
 	jwt.RegisteredClaims
 }
 
@@ -38,6 +39,7 @@ func (u *Users) Login(ctx context.Context, name, password string) (tokenString s
 	uc := &jwtClaims{
 		Id:   uint(user.Id),
 		Name: user.Name,
+		Role: user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    consts.JwtIssuer,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),

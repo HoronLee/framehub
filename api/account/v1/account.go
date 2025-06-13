@@ -12,6 +12,7 @@ type InfoReq struct {
 type InfoRes struct {
 	Name      string      `json:"name" dc:"用户名"`
 	Email     string      `json:"email" dc:"邮箱"`
+	Role      string      `json:"role" dc:"角色"`
 	CreatedAt *gtime.Time `json:"created" dc:"创建时间"`
 	UpdatedAt *gtime.Time `json:"update" dc:"更新时间"`
 }

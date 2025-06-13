@@ -41,3 +41,8 @@ genall:
 # build
 build:
 	mkdir -p bin/ && go build -o ./bin/ ./...
+
+.PHONY: run
+# run
+run:
+	gf run main.go
