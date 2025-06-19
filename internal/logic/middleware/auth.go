@@ -1,13 +1,25 @@
 package middleware
 
 import (
+	"context"
+	"fmt"
 	"framehub/internal/consts"
 	"net/http"
 	"strings"
 
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/golang-jwt/jwt/v5"
 )
+
+var MwConf struct {
+	JwtSecretKey string
+}
+
+func InitMwConfig(ctx context.Context) {
+	MwConf.JwtSecretKey = g.Cfg().MustGet(ctx, "jwt.secretKey").String()
+	fmt.Println(MwConf.JwtSecretKey)
+}
 
 // AuthMiddleware 返回一个可配置的中间件，要求最低权限为 minRole
 func AuthMiddleware(minRole consts.UserRole) ghttp.HandlerFunc {
@@ -25,7 +37,7 @@ func AuthMiddleware(minRole consts.UserRole) ghttp.HandlerFunc {
 
 		// 解析 JWT Token
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
-			return []byte(consts.JwtKey), nil
+			return []byte(MwConf.JwtSecretKey), nil
 		})
 		if err != nil || !token.Valid {
 			r.Response.WriteStatus(http.StatusForbidden)
@@ -40,7 +52,7 @@ func AuthMiddleware(minRole consts.UserRole) ghttp.HandlerFunc {
 		}
 
 		// 获取用户角色并转换为 consts.UserRole 类型
-		roleStr, ok := claims["role"].(string)
+		roleStr, ok := claims["Role"].(string)
 		if !ok {
 			r.Response.WriteStatus(http.StatusForbidden)
 			r.Exit()

@@ -7,6 +7,7 @@ import (
 	"framehub/internal/logic/users"
 )
 
+// Register 用户注册控制器
 func (c *ControllerV1) Register(ctx context.Context, req *v1.RegisterReq) (res *v1.RegisterRes, err error) {
 	err = c.users.Register(ctx, users.RegisterInput{
 		Name:     req.Name,

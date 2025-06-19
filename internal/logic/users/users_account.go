@@ -2,7 +2,7 @@ package users
 
 import (
 	"context"
-	"framehub/internal/consts"
+	"fmt"
 	"framehub/internal/dao"
 	"framehub/internal/model/entity"
 	"time"
@@ -12,19 +12,17 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type jwtConfig struct {
+var JwtConfig struct {
 	SecretKey string
 	Issuer    string
-	Expire    time.Time
+	Expire    time.Duration
 }
 
-func InitJwtawConfig(ctx context.Context) *jwtConfig {
-	conf, _ := g.Cfg().Get(ctx, "jwt")
-	return &jwtConfig{
-		SecretKey: conf.MapStrVar()["secretKey"].String(),
-		Issuer:    conf.MapStrVar()["issuer"].String(),
-		Expire:    conf.MapStrVar()["expire"].Time(),
-	}
+func InitJwtConfig(ctx context.Context) {
+	JwtConfig.SecretKey = g.Cfg().MustGet(ctx, "jwt.secretKey").String()
+	JwtConfig.Issuer = g.Cfg().MustGet(ctx, "jwt.issuer").String()
+	expireHour := g.Cfg().MustGet(ctx, "jwt.expire").Int()
+	JwtConfig.Expire = time.Duration(expireHour) * time.Hour
 }
 
 type jwtClaims struct {
@@ -56,12 +54,13 @@ func (u *Users) Login(ctx context.Context, name, password string) (tokenString s
 		Name: user.Name,
 		Role: user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    consts.JwtIssuer,
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			Issuer:    JwtConfig.Issuer,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(JwtConfig.Expire)),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, uc)
-	return token.SignedString([]byte(consts.JwtKey))
+	fmt.Println("JWT Secret Key:", JwtConfig.SecretKey)
+	return token.SignedString([]byte(JwtConfig.SecretKey))
 }
 
 func (u *Users) Info(ctx context.Context) (user *entity.Users, err error) {
@@ -74,7 +73,7 @@ func (u *Users) Info(ctx context.Context) (user *entity.Users, err error) {
 	}
 
 	tokenClaims, _ := jwt.ParseWithClaims(tokenString, &jwtClaims{}, func(token *jwt.Token) (any, error) {
-		return []byte(consts.JwtKey), nil
+		return []byte(JwtConfig.SecretKey), nil
 	})
 
 	if claims, ok := tokenClaims.Claims.(*jwtClaims); ok && tokenClaims.Valid {
